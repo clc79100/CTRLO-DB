@@ -1,0 +1,12 @@
+## Proyecto 3: Tienda de Ropa - Claudio Castro
+
+Nombre del proyecto: ModaStore
+
+**Módulos**:
+- Control de acceso (roles: administrador, vendedor)
+- Productos (ropa, tallas, colores, precios, stock)
+- Clientes (registro de compradores, historial de compras)
+- Ventas (factura, fecha, productos vendidos)
+- Inventario (stock por categoría, alertas de bajo stock)
+- Proveedores (contacto, productos ofrecidos)
+- Reportes (ventas, productos más vendidos, inventario)
