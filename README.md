@@ -17,3 +17,4 @@ Nombre del proyecto: ModaStore
 - Update individual al stock por tallas a Product
 - Update general a Product
 - Bajas logicas a todas las tablas
+- Trigger para actualizar el stock después de una venta
