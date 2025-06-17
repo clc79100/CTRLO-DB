@@ -1,3 +1,11 @@
+CREATE USER 'api-user'@'%' IDENTIFIED BY 'Password1';
+GRANT ALL PRIVILEGES ON *.* TO 'api-user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+CREATE USER 'test-user'@'%' IDENTIFIED BY 'Password1';
+GRANT ALL PRIVILEGES ON *.* TO 'api-user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
 DROP DATABASE IF EXISTS ModaStore;
 CREATE DATABASE ModaStore;
 USE ModaStore;
@@ -65,15 +73,15 @@ CREATE TABLE Products_Sold(
     CONSTRAINT fk_product_id FOREIGN KEY(product_id) REFERENCES Product(product_id)
 );
 
--- Procedure de Reporte de Ventas
+-- Procedures de Ventas
 DELIMITER //
 CREATE PROCEDURE sp_Sales_Report(IN start_date DATE, IN end_date DATE)
 BEGIN
     SELECT
         S.sale_id,
-        DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date,
         S.sale_invoice_num,
-        SUM(P.product_price * PS.quantity_sold) AS total_sales
+        DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date,
+        SUM(P.product_price * PS.quantity_sold) AS total_sale
     FROM Sale S
     INNER JOIN Products_Sold PS
         ON S.sale_id = PS.sale_id
@@ -90,8 +98,45 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE sp_Sale_Detail(IN id_to_search INT)
+BEGIN
+    -- Datos de la Venta/Factura
+   SELECT
+        S.sale_id,
+        DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date,
+        S.sale_invoice_num,
+        SUM(P.product_price * PS.quantity_sold) AS total_sale
+    FROM Sale S
+    INNER JOIN Products_Sold PS
+        ON S.sale_id = PS.sale_id
+    INNER JOIN Product P
+        ON PS.product_id = P.product_id
+    WHERE S.sale_id = id_to_search
+    GROUP BY
+        S.sale_id,
+        S.sale_date,
+        S.sale_invoice_num;
 
--- Procedure de Reporte de Productos Vendidos 
+    -- Productos Vendidos
+    SELECT
+        P.product_code,
+        P.product_name,
+        P.product_color,
+        P.product_size,
+        P.product_price,
+        PS.quantity_sold
+    FROM Sale S
+    INNER JOIN Products_Sold PS
+        ON S.sale_id = PS.sale_id
+    INNER JOIN Product P
+        ON PS.product_id = P.product_id
+    WHERE S.sale_id = id_to_search;
+END //
+DELIMITER ;
+
+
+-- Procedure de Reporte de Productos 
 DELIMITER //
 CREATE PROCEDURE sp_Stock_Report(IN id_to_search INT)
 BEGIN
@@ -101,15 +146,15 @@ BEGIN
         P.product_price,
         CT.category_name,
         SUM(P.product_stock) total_stock
-        FROM Product P
-        INNER JOIN Category CT
-            ON P.category_id = CT.category_id
-        WHERE (id_to_search IS NULL OR CT.category_id = id_to_search)
-        GROUP BY
-            P.product_code,
-            P.product_name,
-            P.product_price,
-            CT.category_name;
+    FROM Product P
+    INNER JOIN Category CT
+        ON P.category_id = CT.category_id
+    WHERE (id_to_search IS NULL OR CT.category_id = id_to_search)
+    GROUP BY
+        P.product_code,
+        P.product_name,
+        P.product_price,
+        CT.category_name;
 END //
 DELIMITER ;
 
@@ -180,6 +225,7 @@ BEGIN
     (new_code, product_name, 'L', product_color, product_price, product_stock_L, provider_id, category_id);
 END //
 DELIMITER ;
+
 
 
 INSERT INTO User (user_name, user_role, user_mail, user_password) VALUES
