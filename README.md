@@ -12,9 +12,7 @@ Nombre del proyecto: ModaStore
 - Reportes (ventas, productos más vendidos, inventario)
 
 **TODO**
-- Detalle de Reporte de stock
-- Detalle de Reporte de Ventas
-- Update individual al stock por tallas a Product
+- Update individual al stock de un prodcuto por tallas a Product
 - Update general a Product
-- Bajas logicas a todas las tablas
 - Trigger para actualizar el stock después de una venta
+- Trigger para sumar piezas vendidas del stock, al cancelar una venta

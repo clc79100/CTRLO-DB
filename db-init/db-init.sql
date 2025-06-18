@@ -1,9 +1,11 @@
+DROP USER IF EXISTS 'api-user'@'%';
 CREATE USER 'api-user'@'%' IDENTIFIED BY 'Password1';
-GRANT ALL PRIVILEGES ON *.* TO 'api-user'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON ModaStore.* TO 'api-user'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
+DROP USER IF EXISTS 'test-user'@'%';
 CREATE USER 'test-user'@'%' IDENTIFIED BY 'Password1';
-GRANT ALL PRIVILEGES ON *.* TO 'api-user'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'test-user'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
 DROP DATABASE IF EXISTS ModaStore;
@@ -13,6 +15,7 @@ USE ModaStore;
 CREATE TABLE Category(
     category_id INT NOT NULL AUTO_INCREMENT,
     category_name VARCHAR(30),
+    category_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(category_id)
 );
 
@@ -21,12 +24,14 @@ CREATE TABLE Provider(
     provider_name VARCHAR(30) NOT NULL,
     provider_mail VARCHAR(30),
     provider_phone VARCHAR(10),
+    provider_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(provider_id)
 );
 
 CREATE TABLE Customer(
     customer_id INT NOT NULL AUTO_INCREMENT,
     customer_name VARCHAR(30),
+    customer_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(customer_id)
 );
 
@@ -36,6 +41,7 @@ CREATE TABLE User(
     user_role VARCHAR(30) NOT NULL,
     user_mail VARCHAR(50) NOT NULL,
     user_password VARCHAR(10) NOT NULL,
+    user_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(user_id)
 );
 
@@ -49,6 +55,7 @@ CREATE TABLE Product(
     product_stock INT NOT NULL,
     provider_id INT NOT NULL,
     category_id INT NOT NULL,
+    product_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(product_id),
     CONSTRAINT fk_category_id FOREIGN KEY(category_id) REFERENCES Category(category_id),
     CONSTRAINT fk_provider_id FOREIGN KEY(provider_id) REFERENCES Provider(provider_id)
@@ -59,6 +66,7 @@ CREATE TABLE Sale(
     sale_invoice_num INT NOT NULL UNIQUE,
     sale_date DATE NOT NULL,
     customer_id INT NOT NULL,
+    sale_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(sale_id),
     CONSTRAINT fk_customer_id FOREIGN KEY(customer_id) REFERENCES Customer(customer_id)
 );
@@ -73,7 +81,8 @@ CREATE TABLE Products_Sold(
     CONSTRAINT fk_product_id FOREIGN KEY(product_id) REFERENCES Product(product_id)
 );
 
--- Procedures de Ventas
+-- ----------------------------- Procedures de Ventas -----------------------------
+-- Filtro opcional por rango de fechas
 DELIMITER //
 CREATE PROCEDURE sp_Sales_Report(IN start_date DATE, IN end_date DATE)
 BEGIN
@@ -89,7 +98,8 @@ BEGIN
         ON PS.product_id = P.product_id
     WHERE 
         (start_date IS NULL OR S.sale_date >= start_date) AND
-        (end_date IS NULL OR S.sale_date <= end_date)
+        (end_date IS NULL OR S.sale_date >= end_date) AND
+        (S.sale_is_active = TRUE)
     GROUP BY
         S.sale_id,
         S.sale_date,
@@ -98,6 +108,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Procedure para obtener los detalles de una venta específica
 DELIMITER //
 CREATE PROCEDURE sp_Sale_Detail(IN id_to_search INT)
 BEGIN
@@ -112,7 +123,9 @@ BEGIN
         ON S.sale_id = PS.sale_id
     INNER JOIN Product P
         ON PS.product_id = P.product_id
-    WHERE S.sale_id = id_to_search
+    WHERE 
+        (S.sale_id = id_to_search) AND 
+        (S.sale_is_active = TRUE)
     GROUP BY
         S.sale_id,
         S.sale_date,
@@ -131,44 +144,115 @@ BEGIN
         ON S.sale_id = PS.sale_id
     INNER JOIN Product P
         ON PS.product_id = P.product_id
-    WHERE S.sale_id = id_to_search;
+    WHERE 
+        (S.sale_id = id_to_search) AND 
+        (S.sale_is_active = TRUE);
 END //
 DELIMITER ;
 
 
--- Procedure de Reporte de Productos 
+-- ----------------------------- Procedures de Productos -----------------------------
+-- Filtro opcional por id de categoría y rango de stock
 DELIMITER //
-CREATE PROCEDURE sp_Stock_Report(IN id_to_search INT)
+CREATE PROCEDURE sp_Stock_Report(IN id_to_search INT, IN min_stock INT, IN max_stock INT)
 BEGIN
     SELECT
         P.product_code,
         P.product_name,
         P.product_price,
         CT.category_name,
-        SUM(P.product_stock) total_stock
+        SUM(P.product_stock) AS total_stock
     FROM Product P
     INNER JOIN Category CT
         ON P.category_id = CT.category_id
-    WHERE (id_to_search IS NULL OR CT.category_id = id_to_search)
+    WHERE 
+        (id_to_search IS NULL OR CT.category_id = id_to_search) AND
+        (P.product_is_active = TRUE)
     GROUP BY
         P.product_code,
         P.product_name,
         P.product_price,
-        CT.category_name;
+        CT.category_name
+    HAVING
+        (min_stock IS NULL OR total_stock >= min_stock) AND
+        (max_stock IS NULL OR total_stock <= max_stock);
 END //
 DELIMITER ;
 
--- Procedure de Productos por Proveedor
+-- Procedure para obtener los detalles de un producto específico
+DELIMITER //
+CREATE PROCEDURE sp_Product_Detail(IN code_to_search INT)
+BEGIN
+    -- Datos del Producto
+    SELECT
+        P.product_code,
+        P.product_name,
+        P.product_price,
+        CT.category_name,
+        PR.provider_name
+    FROM Product P
+    INNER JOIN Category CT
+        ON P.category_id = CT.category_id
+    INNER JOIN Provider PR
+        ON P.provider_id = PR.provider_id
+    WHERE 
+        (P.product_code = code_to_search) AND
+        (P.product_is_active = TRUE)
+    GROUP BY
+        P.product_code,
+        P.product_name,
+        P.product_price,
+        CT.category_name,
+        PR.provider_name;
+
+    -- Stock por tallas
+    SELECT
+        P.product_size,
+        P.product_stock
+    FROM Product P
+    WHERE 
+        (P.product_code = code_to_search) AND 
+        (P.product_is_active = TRUE);
+END //
+DELIMITER ;
+
+-- ----------------------------- Procedures de Proveedor -----------------------------
+
+-- Lista de proveedores activos
+DELIMITER //
+CREATE PROCEDURE sp_Provider_List()
+BEGIN
+    SELECT
+        PR.provider_id,
+        PR.provider_name
+    FROM Provider PR
+    WHERE
+        (PR.provider_is_active = TRUE)
+    ORDER BY PR.provider_id;
+END //
+DELIMITER ;
+
+-- Procedure para obtener los detalles de un proveedor específico
 DELIMITER //
 CREATE PROCEDURE sp_Provider_Products(IN id_to_search INT)
 BEGIN
+    SELECT
+        *
+    FROM Provider PR
+    WHERE 
+        (PR.provider_id = id_to_search) AND
+        (PR.provider_is_active = TRUE);
+
     SELECT
         P.product_code,
         P.product_name
     FROM Product P
     JOIN Provider PR
         ON P.provider_id = PR.provider_id
-    WHERE P.provider_id = id_to_search
+    WHERE 
+        (PR.provider_id = id_to_search) AND
+        (P.product_is_active = TRUE) AND
+        (PR.provider_is_active = TRUE)
     GROUP BY
         P.product_code,
         P.product_name
@@ -176,16 +260,38 @@ BEGIN
 END //
 DELIMITER ;
 
--- Procedure de Historial de Compras de Cliente
+-- ----------------------------- Procedures de Cliente -----------------------------
+
+-- Lista de clientes activos
 DELIMITER //
-CREATE PROCEDURE sp_Customer_History(IN search_id INT)
+CREATE PROCEDURE sp_Customer_List()
 BEGIN
+    SELECT
+        C.customer_id,
+        C.customer_name
+    FROM Customer C
+    WHERE
+        (C.customer_is_active = TRUE)
+    ORDER BY C.customer_id;
+    END //
+    DELIMITER ;
+
+-- Se muestra todos los productos sin importar la baja logica
+DELIMITER //
+CREATE PROCEDURE sp_Customer_Detail(IN search_id INT)
+BEGIN
+    SELECT
+        *
+    FROM Customer C
+    WHERE 
+        (C.customer_id = search_id) AND
+        (C.customer_is_active = TRUE);
+
     SELECT
         P.product_id,
         P.product_name,
         P.product_size,
         P.product_color,
-
         S.sale_invoice_num,
         DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date
         FROM Product P
@@ -193,12 +299,19 @@ BEGIN
             ON P.product_id = PS.product_id
         INNER JOIN Sale S
             ON PS.sale_id = S.sale_id
-        WHERE S.customer_id = search_id
+        WHERE 
+            (S.customer_id = search_id) AND
+            (S.sale_is_active = TRUE)
         ORDER BY S.sale_date;
 END //
 DELIMITER ;
 
--- Procedure de Inserción de Productos para los tres tamaños de ropa
+
+
+-- ****************************** Procedures de Inserción ******************************
+
+-- ----------------------------- Procedures de Inserción de Categorías -----------------------------
+-- Inserción de un producto con 3 diferentes stock(L, M, S)
 DELIMITER //
 CREATE PROCEDURE sp_Insert_Product(
     IN product_name VARCHAR(30),
@@ -225,8 +338,6 @@ BEGIN
     (new_code, product_name, 'L', product_color, product_price, product_stock_L, provider_id, category_id);
 END //
 DELIMITER ;
-
-
 
 INSERT INTO User (user_name, user_role, user_mail, user_password) VALUES
   ('Big Negroide',  'admin',    'big@negroides.world',    'Adm1nPass'),
