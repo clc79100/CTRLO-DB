@@ -150,7 +150,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
 -- ----------------------------- Procedures de Productos -----------------------------
 -- Filtro opcional por id de categoría y rango de stock
 DELIMITER //
