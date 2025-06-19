@@ -1,6 +1,7 @@
 USE ModaStore;
 -- ----------------------------- Procedures de Ventas -----------------------------
 -- Filtro opcional por rango de fechas
+-- Muestra ventas activas sin importar si los productos estan activos o no
 DELIMITER //
 CREATE PROCEDURE sp_Sales_Report(IN start_date DATE, IN end_date DATE)
 BEGIN
@@ -151,7 +152,7 @@ DELIMITER ;
 
 -- Procedure para obtener los detalles de un proveedor específico
 DELIMITER //
-CREATE PROCEDURE sp_Provider_Products(IN id_to_search INT)
+CREATE PROCEDURE sp_Provider_Detail(IN id_to_search INT)
 BEGIN
     SELECT
         PR.provider_id,
@@ -227,3 +228,49 @@ BEGIN
 END //
 DELIMITER ;
 
+
+-- ----------------------------- Procedures de Usuario -----------------------------
+-- Lista de usuarios activos
+DELIMITER //
+CREATE PROCEDURE sp_User_List(IN search_role VARCHAR(30))
+BEGIN
+    SELECT
+        U.user_id,
+        U.user_mail,
+        U.user_role
+    FROM User U
+    WHERE
+        (U.user_is_active = TRUE) &&
+        (search_role IS NULL OR U.user_role = search_role)
+    ORDER BY U.user_id;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE sp_User_Detail(IN search_id INT)
+BEGIN
+    SELECT
+        U.user_id,
+        U.user_mail,
+        U.user_role
+    FROM User U
+    WHERE
+        (U.user_id = search_id) AND
+        (U.user_is_active = TRUE);
+END //
+DELIMITER ;
+
+-- ----------------------------- Procedures de Categoría -----------------------------
+-- Lista de categorías activas
+DELIMITER //
+CREATE PROCEDURE sp_Category_List()
+BEGIN
+    SELECT
+        C.category_id,
+        C.category_name
+    FROM Category C
+    WHERE
+        (C.category_is_active = TRUE)
+    ORDER BY C.category_id;
+END //
+DELIMITER ;

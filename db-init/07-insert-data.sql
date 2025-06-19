@@ -1,7 +1,7 @@
 USE ModaStore;
-INSERT INTO User (user_name, user_role, user_mail, user_password) VALUES
-  ('Big Negroide',  'admin',    'big@negroides.world',    'Adm1nPass'),
-  ('Bob Vendedor','vendedor', 'bob@modastore.com',      'Vend3rPass');
+INSERT INTO User (user_mail, user_password, user_role) VALUES
+  ('big@negroides.world', 'Adm1nPass', 'admin'),
+  ('bob@modastore.com', 'Vend3rPass', 'vendedor');
 
 INSERT INTO Category (category_name) VALUES
   ('Caballero'),

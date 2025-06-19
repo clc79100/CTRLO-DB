@@ -1,5 +1,5 @@
 USE ModaStore;
--- ----------------------------- Procedures de Inserción de Categorías -----------------------------
+-- ----------------------------- Procedures de Inserción de Productos -----------------------------
 -- Inserción de un producto con 3 diferentes stock(L, M, S)
 DELIMITER //
 CREATE PROCEDURE sp_Insert_Product(
@@ -55,5 +55,54 @@ BEGIN
             product_quantity INT PATH '$.product_quantity'
         )
     ) AS jt;
+END //
+DELIMITER ;
+
+-- ----------------------------- Procedure de Insercion de Usuarios -----------------------------
+
+DELIMITER //
+CREATE PROCEDURE sp_Insert_User(
+    IN v_user_mail VARCHAR(50),
+    IN v_user_password VARCHAR(10),
+    IN v_user_role VARCHAR(30)
+)
+BEGIN
+    INSERT INTO User (user_mail, user_password, user_role)
+    VALUES (v_user_mail, v_user_password, v_user_role);
+END //
+DELIMITER ;
+
+-- ----------------------------- Procedure de Insercion de Clientes -----------------------------
+DELIMITER //
+CREATE PROCEDURE sp_Insert_Customer(
+    IN v_customer_name VARCHAR(30)
+)
+BEGIN
+    INSERT INTO Customer (customer_name)
+    VALUES (v_customer_name);
+END //
+DELIMITER ;
+
+-- ----------------------------- Procedure de Insercion de Proveedores -----------------------------
+DELIMITER //
+CREATE PROCEDURE sp_Insert_Provider(
+    IN v_provider_name VARCHAR(30),
+    IN v_provider_mail VARCHAR(30),
+    IN v_provider_phone VARCHAR(10)
+)
+BEGIN
+    INSERT INTO Provider (provider_name, provider_mail, provider_phone)
+    VALUES (v_provider_name, v_provider_mail, v_provider_phone);
+END //
+DELIMITER ;
+
+-- ----------------------------- Procedure de Insercion de Categorias -----------------------------
+DELIMITER //
+CREATE PROCEDURE sp_Insert_Category(
+    IN v_category_name VARCHAR(30)
+)
+BEGIN
+    INSERT INTO Category (category_name)
+    VALUES (v_category_name);
 END //
 DELIMITER ;
