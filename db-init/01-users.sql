@@ -1,0 +1,9 @@
+DROP USER IF EXISTS 'api-user'@'%';
+CREATE USER 'api-user'@'%' IDENTIFIED BY 'Password1';
+GRANT ALL PRIVILEGES ON ModaStore.* TO 'api-user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+DROP USER IF EXISTS 'test-user'@'%';
+CREATE USER 'test-user'@'%' IDENTIFIED BY 'Password1';
+GRANT ALL PRIVILEGES ON *.* TO 'test-user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
