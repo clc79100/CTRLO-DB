@@ -210,10 +210,9 @@ BEGIN
         (C.customer_is_active = TRUE);
 
     SELECT
-        P.product_id,
+        P.product_code,
         P.product_name,
         P.product_size,
-        P.product_color,
         S.sale_invoice_num,
         DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date
         FROM Product P

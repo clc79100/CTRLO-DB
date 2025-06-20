@@ -21,8 +21,12 @@
 ![Diagrama de la base de datos](resources/E-R.png)
 
 ## Procedures
-- **[Ventas](/docs/ventas.md)**
-- **[Productos](/docs/productos.md)**
+1. **[Ventas](/docs/ventas.md)**
+2. **[Productos](/docs/productos.md)**
+3. **[Proveedores](/docs/proveedores.md)**
+4. **[Clientes](/docs/clientes.md)**
+5. **[Usuarios](/docs/usuarios.md)**
+6. **[Categorías](/docs/categorias.md)**
 
 **Nota**
 - Los parametros nulos se envian de la siguiente manera: 

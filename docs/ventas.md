@@ -11,7 +11,7 @@
 - ```sql
   CALL sp_Sales_Report('2023-10-01', '2023-10-30');
   ```
-![sp_Sales_Report](../resources/sp_Sales_Report.jpg)
+- ![sp_Sales_Report](../resources/sp_Sales_Report.jpg)
 
 ---
 
@@ -24,10 +24,9 @@
 ```sql
   CALL sp_Sale_Detail(1);
 ```
-- `CALL sp_Sale_Detail(1);`
-- Datos de Venta
+1. Datos de Venta
 - ![sp_Sales_Report Resultado 1](../resources/sp_Sale_Detail_1.jpg)
-- Productos Vendidos
+2. Productos Vendidos
 - ![sp_Sales_Report](../resources/sp_Sale_Detail_2.jpg)
 
 ---

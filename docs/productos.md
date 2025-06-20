@@ -14,7 +14,7 @@
 - ```sql
   CALL sp_Stock_Report(1, 20, 30)
   ```
-![sp_Stock_Report](../resources/sp_Stock_Report.jpg)
+- ![sp_Stock_Report](../resources/sp_Stock_Report.jpg)
 
 ---
 
@@ -27,9 +27,9 @@
 - ```sql
   CALL sp_Product_Detail(1);
     ```
-- Datos del Producto
+1. Datos del Producto
 - ![sp_Stock_Report](../resources/sp_Product_Detail_1.jpg)
-- Stock por tallas del Producto
+2. Stock por tallas del Producto
 - ![sp_Stock_Report](../resources/sp_Product_Detail_2.jpg)
 
 ---
