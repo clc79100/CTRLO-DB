@@ -66,7 +66,6 @@ imagen de resultado (solo para procedures de tipo SELECT)
   - Productos Vendidos
   - ![sp_Sales_Report](resources/sp_Sale_Detail_2.jpg)
 
-### Ventas
 #### <u>sp_Insert_Sale</u>
 - Parametros:
   - v_sale_invoice_num 
