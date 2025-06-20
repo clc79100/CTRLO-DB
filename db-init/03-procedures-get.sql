@@ -17,7 +17,7 @@ BEGIN
         ON PS.product_id = P.product_id
     WHERE 
         (start_date IS NULL OR S.sale_date >= start_date) AND
-        (end_date IS NULL OR S.sale_date >= end_date) AND
+        (end_date IS NULL OR S.sale_date <= end_date) AND
         (S.sale_is_active = TRUE)
     GROUP BY
         S.sale_id,
@@ -72,7 +72,7 @@ DELIMITER ;
 -- ----------------------------- Procedures de Productos -----------------------------
 -- Filtro opcional por id de categoría y rango de stock
 DELIMITER //
-CREATE PROCEDURE sp_Stock_Report(IN id_to_search INT, IN min_stock INT, IN max_stock INT)
+CREATE PROCEDURE sp_Stock_Report(IN category_id_to_search INT, IN min_stock INT, IN max_stock INT)
 BEGIN
     SELECT
         P.product_code,
@@ -84,7 +84,7 @@ BEGIN
     INNER JOIN Category CT
         ON P.category_id = CT.category_id
     WHERE 
-        (id_to_search IS NULL OR CT.category_id = id_to_search) AND
+        (category_id_to_search IS NULL OR CT.category_id = category_id_to_search) AND
         (P.product_is_active = TRUE)
     GROUP BY
         P.product_code,
@@ -98,13 +98,13 @@ END //
 DELIMITER ;
 
 -- Procedure para obtener los detalles de un producto específico
-DELIMITER //
 CREATE PROCEDURE sp_Product_Detail(IN code_to_search INT)
 BEGIN
     -- Datos del Producto
     SELECT
         P.product_code,
         P.product_name,
+        P.product_color,
         P.product_price,
         CT.category_name,
         PR.provider_name
@@ -120,6 +120,7 @@ BEGIN
         P.product_code,
         P.product_name,
         P.product_price,
+        P.product_color,
         CT.category_name,
         PR.provider_name;
 
@@ -133,7 +134,6 @@ BEGIN
         (P.product_is_active = TRUE);
 END //
 DELIMITER ;
-
 -- ----------------------------- Procedures de Proveedor -----------------------------
 
 -- Lista de proveedores activos

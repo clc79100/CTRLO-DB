@@ -49,7 +49,7 @@ BEGIN
     INSERT INTO Products_Sold (sale_id, product_id, quantity_sold)
     SELECT new_sale_id, product_id, product_quantity
     -- Se insertan los productos vendidos desde el Array JSON
-    FROM JSON_TABLE(products_sold, '$[*]'
+    FROM JSON_TABLE(v_products_sold, '$[*]'
         COLUMNS (
             product_id INT PATH '$.product_id',
             product_quantity INT PATH '$.product_quantity'

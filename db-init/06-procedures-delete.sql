@@ -2,60 +2,60 @@ USE ModaStore;
 
 -- ----------------------------- Procedimiento de Eliminación de Productos -----------------------------
 DELIMITER //
-CREATE PROCEDURE sp_Delete_Product(IN v_product_code INT)
+CREATE PROCEDURE sp_Delete_Product(IN id_to_seatch INT)
 BEGIN
     UPDATE Product
-    SET is_active = 0
-    WHERE product_code = v_product_code;
+    SET product_is_active = 0
+    WHERE product_code = id_to_seatch;
 END //
 DELIMITER ;
 
 -- ----------------------------- Procedimiento de Eliminación de Ventas -----------------------------
 DELIMITER //
-CREATE PROCEDURE sp_Delete_Sale(IN v_sale_id INT)
+CREATE PROCEDURE sp_Delete_Sale(IN id_to_seatch INT)
 BEGIN
     UPDATE Sale
     SET sale_is_active = 0
-    WHERE sale_id = v_sale_id;
+    WHERE sale_id = id_to_seatch;
 END //
 DELIMITER ;
 
 -- ----------------------------- Procedimiento de Eliminación de Clientes -----------------------------
 DELIMITER //
-CREATE PROCEDURE sp_Delete_Customer(IN v_customer_id INT)
+CREATE PROCEDURE sp_Delete_Customer(IN id_to_search INT)
 BEGIN
     UPDATE Customer
     SET customer_is_active = 0
-    WHERE customer_id = v_customer_id;
+    WHERE customer_id = id_to_search;
 END //
 DELIMITER ;
 
 -- ----------------------------- Procedimiento de Eliminación de Proveedores -----------------------------
 DELIMITER //
-CREATE PROCEDURE sp_Delete_Provider(IN v_provider_id INT)
+CREATE PROCEDURE sp_Delete_Provider(IN id_to_search INT)
 BEGIN
     UPDATE Provider
     SET provider_is_active = 0
-    WHERE provider_id = v_provider_id;
+    WHERE provider_id = id_to_search;
 END //
 DELIMITER ;     
 
 -- ----------------------------- Procedimiento de Eliminación de Usuarios -----------------------------
 DELIMITER //
-CREATE PROCEDURE sp_Delete_User(IN v_user_id INT)
+CREATE PROCEDURE sp_Delete_User(IN id_to_search INT)
 BEGIN
     UPDATE User
     SET user_is_active = 0
-    WHERE user_id = v_user_id;
+    WHERE user_id = id_to_search;
 END //
 DELIMITER ;
 
 -- ----------------------------- Procedimiento de Eliminación de Categorías -----------------------------
 DELIMITER //
-CREATE PROCEDURE sp_Delete_Category(IN v_category_id INT)
+CREATE PROCEDURE sp_Delete_Category(IN id_to_search INT)
 BEGIN
     UPDATE Category
     SET category_is_active = 0
-    WHERE category_id = v_category_id;
+    WHERE category_id = id_to_search;
 END //
 DELIMITER ;
