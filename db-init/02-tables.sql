@@ -54,8 +54,9 @@ CREATE TABLE Product(
 
 CREATE TABLE Sale(
     sale_id INT NOT NULL AUTO_INCREMENT,
-    sale_invoice_num INT NOT NULL UNIQUE,
+    sale_invoice_num VARCHAR(20) NOT NULL UNIQUE,
     sale_date DATE NOT NULL,
+    total_sale DECIMAL(7, 2) NOT NULL,
     customer_id INT NOT NULL,
     sale_is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(sale_id),

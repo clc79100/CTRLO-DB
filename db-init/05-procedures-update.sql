@@ -35,36 +35,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- ----------------------------- Procedure de Actualización de Ventas -----------------------------
-DELIMITER //
-CREATE PROCEDURE sp_Update_Sale(
-    IN v_sale_id INT,
-    IN v_sale_invoice_num INT,
-    IN v_sale_date DATE,
-    IN v_customer_id INT,
-    IN v_products_sold JSON
-)
-BEGIN
-    -- Actualizar la venta
-    UPDATE Sale
-    SET 
-        sale_invoice_num = v_sale_invoice_num,
-        sale_date = v_sale_date,
-        customer_id = v_customer_id
-    WHERE sale_id = v_sale_id;
-    -- Eliminar los productos vendidos anteriores
-    DELETE FROM Products_Sold WHERE sale_id = v_sale_id;
-    -- Insertar los nuevos productos vendidos
-    INSERT INTO Products_Sold (sale_id, product_id, quantity_sold)
-    SELECT v_sale_id, product_id, product_quantity
-    FROM JSON_TABLE(v_products_sold, '$[*]'
-        COLUMNS (
-            product_id INT PATH '$.product_id',
-            product_quantity INT PATH '$.product_quantity'
-        )
-    ) AS jt;
-END //
-DELIMITER ;
+
 
 -- ----------------------------- Procedure de Actualización de Usuarios -----------------------------
 DELIMITER //

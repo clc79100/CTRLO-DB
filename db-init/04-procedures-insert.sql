@@ -31,33 +31,52 @@ DELIMITER ;
 -- ----------------------------- Procedimiento de Inserción de Ventas -----------------------------
 DELIMITER //
 CREATE PROCEDURE sp_Insert_Sale(
-    IN v_sale_invoice_num INT,
     IN v_sale_date DATE,
     IN v_customer_id INT,
     IN v_products_sold JSON
 )
 BEGIN
     DECLARE new_sale_id INT;
-    -- Insertar la venta
-    INSERT INTO Sale (sale_invoice_num, sale_date, customer_id)
-    VALUES (v_sale_invoice_num, v_sale_date, v_customer_id);
-    
-    -- Obtener el ID de la nueva venta
+    DECLARE v_total_sale DECIMAL(10,2);
+    DECLARE generated_invoice VARCHAR(20);
+
+    -- Calcular el total de la venta
+    SELECT SUM(product_quantity * product_price)
+    INTO v_total_sale
+    FROM JSON_TABLE(v_products_sold, '$[*]'
+        COLUMNS (
+            product_id INT PATH '$.product_id',
+            product_quantity INT PATH '$.product_quantity',
+            product_price DECIMAL(10,2) PATH '$.product_price'
+        )
+    ) AS jt_total;
+
+    -- Insertar la venta SIN el invoice_num por ahora
+    INSERT INTO Sale (sale_invoice_num, sale_date, customer_id, total_sale)
+    VALUES ('TEMP', v_sale_date, v_customer_id, v_total_sale);
+
+    -- Obtener el ID autogenerado
     SET new_sale_id = LAST_INSERT_ID();
-    
+
+    -- Generar el invoice_num basado en el ID
+    SET generated_invoice = CONCAT('MS-', new_sale_id);
+
+    -- Actualizar el invoice_num
+    UPDATE Sale
+    SET sale_invoice_num = generated_invoice
+    WHERE sale_id = new_sale_id;
+
     -- Insertar los productos vendidos
     INSERT INTO Products_Sold (sale_id, product_id, quantity_sold)
     SELECT new_sale_id, product_id, product_quantity
-    -- Se insertan los productos vendidos desde el Array JSON
     FROM JSON_TABLE(v_products_sold, '$[*]'
         COLUMNS (
             product_id INT PATH '$.product_id',
             product_quantity INT PATH '$.product_quantity'
         )
-    ) AS jt;
+    ) AS jt_insert;
 END //
 DELIMITER ;
-
 -- ----------------------------- Procedure de Insercion de Usuarios -----------------------------
 
 DELIMITER //

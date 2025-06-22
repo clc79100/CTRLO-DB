@@ -9,20 +9,12 @@ BEGIN
         S.sale_id,
         S.sale_invoice_num,
         DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date,
-        SUM(P.product_price * PS.quantity_sold) AS total_sale
+        S.total_sale
     FROM Sale S
-    INNER JOIN Products_Sold PS
-        ON S.sale_id = PS.sale_id
-    INNER JOIN Product P
-        ON PS.product_id = P.product_id
     WHERE 
         (start_date IS NULL OR S.sale_date >= start_date) AND
         (end_date IS NULL OR S.sale_date <= end_date) AND
         (S.sale_is_active = TRUE)
-    GROUP BY
-        S.sale_id,
-        S.sale_date,
-        S.sale_invoice_num
     ORDER BY S.sale_date;
 END //
 DELIMITER ;
@@ -36,27 +28,20 @@ BEGIN
         S.sale_id,
         DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date,
         S.sale_invoice_num,
-        SUM(P.product_price * PS.quantity_sold) AS total_sale
+        S.total_sale,
+        C.customer_name
     FROM Sale S
-    INNER JOIN Products_Sold PS
-        ON S.sale_id = PS.sale_id
-    INNER JOIN Product P
-        ON PS.product_id = P.product_id
+    INNER JOIN Customer C
+        ON S.customer_id = C.customer_id
     WHERE 
         (S.sale_id = id_to_search) AND 
-        (S.sale_is_active = TRUE)
-    GROUP BY
-        S.sale_id,
-        S.sale_date,
-        S.sale_invoice_num;
+        (S.sale_is_active = TRUE);
 
     -- Productos Vendidos
     SELECT
         P.product_code,
         P.product_name,
-        P.product_color,
         P.product_size,
-        P.product_price,
         PS.quantity_sold
     FROM Sale S
     INNER JOIN Products_Sold PS
@@ -98,6 +83,7 @@ END //
 DELIMITER ;
 
 -- Procedure para obtener los detalles de un producto específico
+DELIMITER //
 CREATE PROCEDURE sp_Product_Detail(IN code_to_search INT)
 BEGIN
     -- Datos del Producto

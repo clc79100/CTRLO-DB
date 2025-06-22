@@ -14,6 +14,9 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE sp_Delete_Sale(IN id_to_seatch INT)
 BEGIN
+    DELETE FROM Products_Sold
+    WHERE sale_id = id_to_search;
+
     UPDATE Sale
     SET sale_is_active = 0
     WHERE sale_id = id_to_seatch;
