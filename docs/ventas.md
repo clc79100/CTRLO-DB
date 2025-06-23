@@ -33,9 +33,6 @@
 
 ### sp_Insert_Sale
 #### Parametros:
-- v_sale_invoice_num 
-  - INT
-  - **`NULL`**
 - v_sale_date 
   - DATE
   - **`NULL`**
@@ -48,7 +45,6 @@
 #### Ejemplo:
   ```sql
     CALL sp_Insert_Sale(
-      112,
       '2023-10-04',
       1,
       '[
