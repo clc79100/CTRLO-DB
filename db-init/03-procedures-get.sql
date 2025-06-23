@@ -222,6 +222,7 @@ BEGIN
     SELECT
         U.user_id,
         U.user_mail,
+        U.user_password,
         U.user_role
     FROM User U
     WHERE

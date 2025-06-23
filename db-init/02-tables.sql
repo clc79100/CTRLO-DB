@@ -29,7 +29,7 @@ CREATE TABLE Customer(
 
 CREATE TABLE User(
     user_id INT NOT NULL AUTO_INCREMENT,
-    user_mail VARCHAR(50) NOT NULL,
+    user_mail VARCHAR(50) NOT NULL UNIQUE,
     user_password VARCHAR(10) NOT NULL,
     user_role VARCHAR(30) NOT NULL,
     user_is_active BOOLEAN DEFAULT TRUE,
