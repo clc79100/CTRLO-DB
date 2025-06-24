@@ -29,6 +29,7 @@ BEGIN
         DATE_FORMAT(S.sale_date, '%d/%m/%Y') AS sale_date,
         S.sale_invoice_num,
         S.total_sale,
+        C.customer_id,
         C.customer_name
     FROM Sale S
     INNER JOIN Customer C

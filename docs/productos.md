@@ -3,7 +3,7 @@
 #### Parametros:
 - category_id_to_search
   - INT
-  - **`NOT NULL`**
+  - **`NULL`**
 - min_stock
   - INT
   - **`NULL`**
