@@ -82,7 +82,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE sp_Insert_User(
     IN v_user_mail VARCHAR(50),
-    IN v_user_password VARCHAR(10),
+    IN v_user_password VARCHAR(20),
     IN v_user_role VARCHAR(30)
 )
 BEGIN

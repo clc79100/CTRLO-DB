@@ -36,7 +36,7 @@ CALL sp_User_Detail(1);
   - VARCHAR(50)  
   - **`NOT NULL`**
 - v_user_password  
-  - VARCHAR(10)  
+  - VARCHAR(20)  
   - **`NOT NULL`**
 - v_user_role  
   - VARCHAR(30)  
@@ -62,7 +62,7 @@ CALL sp_Insert_User(
   - VARCHAR(50)  
   - **`NOT NULL`**
 - v_user_password  
-  - VARCHAR(10)  
+  - VARCHAR(20)  
   - **`NOT NULL`**
 - v_user_role  
   - VARCHAR(30)  
